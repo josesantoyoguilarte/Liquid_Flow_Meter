@@ -54,13 +54,33 @@ def DispenserAlcohol(struct):
 
 #................................................
 
+
   
+     python_object = {'total_amount_dispensed':0,
+                      'limit':100000, #1 L
+                      'remaining':100000
+                      }
      while 1:
     
             data, adrr = s.recvfrom(1024)
-    
-            StrToInt = float(data)
+
+            json_string = json.dumps(python_object)
+
+            new_python_object = json.loads(json_string)
+            tmpT = new_python_object['total_amount_dispensed']
+            tmplimit = new_python_object['limit']
+            tmpremaining = new_python_object['remaining']
             
+            StrToInt = float(data)
+            new_python_object['remaining'] = tmpremaining-StrToInt 
+            new_python_object['total_amount_dispensed'] = tmpT + StrToInt
+            if tmplimit < tmpT
+              reply = 'Amount exceed '
+              s.sendto(reply, adrr)
+              break
+
+            with open('data.json', 'w') as outfile:
+                json.dump(json_string, outfile)# saves new contenct on json file
             struct.maXcount = StrToInt/2.25
            
             waitTime = struct.maXcount
@@ -133,12 +153,31 @@ def DispenserBeverage(struct):
          DispenserAlcohol(alcohol)
      else:
        
-         
+             python_object = {'total_amount_dispensed':0,
+                              'limit':100000, #1 L
+                              'remaining':100000
+                             }
 	     while 1:
 	    
 	            data, adrr = s1.recvfrom(1024)
 	    
-	            StrToInt = float(data)
+	            json_string = json.dumps(python_object)
+
+                    new_python_object = json.loads(json_string)
+                    tmpT = new_python_object['total_amount_dispensed']
+                    tmplimit = new_python_object['limit']
+                    tmpremaining = new_python_object['remaining']
+                        
+                    StrToInt = float(data)
+                    new_python_object['remaining'] = tmpremaining-StrToInt 
+                    new_python_object['total_amount_dispensed'] = tmpT + StrToInt
+                    if tmplimit < tmpT
+                       reply = 'Amount exceed '
+                       s.sendto(reply, adrr)
+                    break
+
+                    with open('data.json', 'w') as outfile:
+                         json.dump(json_string, outfile)# saves new contenct on json file
 	            
 	            struct.maXcount = StrToInt/2.25
 	           
