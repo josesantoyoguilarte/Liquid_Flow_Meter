@@ -11,4 +11,4 @@ Note: The two Raspberry Pi must be physically connected over the same LAN
 
 AUTHORS: Jose A Santoyo Guilarte , Qixia, Jonah Trevor
 
-USER INSTRUCTIONS:
+
