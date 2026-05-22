@@ -1,7 +1,6 @@
 package com.santoyo.liquidflowmeter.gui;
 
 import com.santoyo.liquidflowmeter.DrinkType;
-
 import java.awt.GridLayout;
 import java.util.function.Consumer;
 import javax.swing.JButton;

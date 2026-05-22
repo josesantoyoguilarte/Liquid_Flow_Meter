@@ -3,7 +3,6 @@ package com.santoyo.liquidflowmeter.gui;
 import com.santoyo.liquidflowmeter.DispenseRequest;
 import com.santoyo.liquidflowmeter.DrinkType;
 import com.santoyo.liquidflowmeter.UdpDispenseClient;
-
 import java.awt.BorderLayout;
 import java.io.IOException;
 import javax.swing.BorderFactory;
@@ -11,7 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,20 +68,16 @@ public final class MainFrame extends JFrame {
 
     private void onRun() {
         if (!state.hasAmount() || state.drink() == null) {
-            JOptionPane.showMessageDialog(this,
-                    "Pick a drink and enter an amount first.",
-                    "Incomplete order",
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this, "Pick a drink and enter an amount first.", "Incomplete order", JOptionPane.WARNING_MESSAGE);
             return;
         }
         try {
             client.send(new DispenseRequest(state.drink(), state.amountMillilitres()));
         } catch (IOException ex) {
             LOG.error("Failed to send dispense request", ex);
-            JOptionPane.showMessageDialog(this,
-                    "Could not reach dispenser: " + ex.getMessage(),
-                    "Network error",
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    this, "Could not reach dispenser: " + ex.getMessage(), "Network error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

@@ -29,12 +29,17 @@ public final class UdpDispenseClient {
     public void send(DispenseRequest request) throws IOException {
         byte[] payload = Integer.toString(request.millilitres()).getBytes(StandardCharsets.UTF_8);
         InetAddress address = InetAddress.getByName(host);
-        DatagramPacket packet = new DatagramPacket(payload, payload.length, address, request.drink().port());
+        DatagramPacket packet = new DatagramPacket(
+                payload, payload.length, address, request.drink().port());
 
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.send(packet);
-            LOG.info("Sent {} ml request for {} to {}:{}",
-                    request.millilitres(), request.drink(), host, request.drink().port());
+            LOG.info(
+                    "Sent {} ml request for {} to {}:{}",
+                    request.millilitres(),
+                    request.drink(),
+                    host,
+                    request.drink().port());
         }
     }
 }
