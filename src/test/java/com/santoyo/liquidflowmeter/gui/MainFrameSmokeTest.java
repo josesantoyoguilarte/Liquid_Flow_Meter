@@ -3,6 +3,9 @@ package com.santoyo.liquidflowmeter.gui;
 import static org.assertj.swing.edt.GuiActionRunner.execute;
 
 import com.santoyo.liquidflowmeter.UdpDispenseClient;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
 import org.assertj.swing.fixture.FrameFixture;
 import org.junit.jupiter.api.AfterAll;
@@ -45,17 +48,35 @@ class MainFrameSmokeTest {
 
     @Test
     void typingDigitsUpdatesDisplay() {
-        window.button(b -> "1".equals(b.target().getText())).click();
-        window.button(b -> "2".equals(b.target().getText())).click();
-        window.button(b -> "5".equals(b.target().getText())).click();
+        window.button(buttonWithText("1")).click();
+        window.button(buttonWithText("2")).click();
+        window.button(buttonWithText("5")).click();
 
-        window.label(l -> "125".equals(l.target().getText())).requireVisible();
+        window.label(labelWithText("125")).requireVisible();
     }
 
     @Test
     void clearResetsDisplay() {
-        window.button(b -> "7".equals(b.target().getText())).click();
-        window.button(b -> "Clear".equals(b.target().getText())).click();
-        window.label(l -> " ".equals(l.target().getText())).requireVisible();
+        window.button(buttonWithText("7")).click();
+        window.button(buttonWithText("Clear")).click();
+        window.label(labelWithText(" ")).requireVisible();
+    }
+
+    private static GenericTypeMatcher<JButton> buttonWithText(String text) {
+        return new GenericTypeMatcher<>(JButton.class) {
+            @Override
+            protected boolean isMatching(JButton button) {
+                return text.equals(button.getText());
+            }
+        };
+    }
+
+    private static GenericTypeMatcher<JLabel> labelWithText(String text) {
+        return new GenericTypeMatcher<>(JLabel.class) {
+            @Override
+            protected boolean isMatching(JLabel label) {
+                return text.equals(label.getText());
+            }
+        };
     }
 }
