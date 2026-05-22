@@ -1,0 +1,50 @@
+﻿# Liquid Flow Meter
+
+Swing client + Raspberry Pi UDP server that dispense a user-requested amount of
+liquid (alcohol or beverage) through a GPIO-controlled valve. Originally a
+SYSC 3010 course project, modernized to Java 21 / Maven and Python 3.
+
+## Repository layout
+
+```
+pom.xml                              Maven build (Java 21, JUnit 5)
+src/main/java/com/santoyo/...        Swing client
+src/test/java/com/santoyo/...        JUnit 5 tests
+python/udp_ip_server.py              UDP dispenser server (runs on the Pi)
+python/json_update.py                Small helper to edit data.json
+.github/workflows/build.yml          CI build
+```
+
+## Build & run the Java client
+
+Requires JDK 21 and Maven 3.9+.
+
+```bash
+mvn package
+java -jar target/liquid-flow-meter-2.0.0.jar
+```
+
+The dispenser host defaults to `10.0.0.30`. Override with:
+
+```bash
+java -Ddispenser.host=192.168.1.42 -jar target/liquid-flow-meter-2.0.0.jar
+```
+
+## Run the dispenser server (Raspberry Pi)
+
+```bash
+python3 python/udp_ip_server.py --host 0.0.0.0 \
+    --alcohol-port 42000 --beverage-port 43000
+```
+
+On non-Pi machines `RPi.GPIO` is stubbed so the server still runs for testing.
+
+## Tests
+
+```bash
+mvn test
+```
+
+## Authors
+
+Jose A. Santoyo Guilarte, Qixia, Jonah Trevor.

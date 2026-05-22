@@ -1,0 +1,93 @@
+﻿package com.santoyo.liquidflowmeter.gui;
+
+import com.santoyo.liquidflowmeter.DispenseRequest;
+import com.santoyo.liquidflowmeter.DrinkType;
+import com.santoyo.liquidflowmeter.UdpDispenseClient;
+
+import java.awt.BorderLayout;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+/**
+ * Main application window. Composes the keypad, the drink-choice panel and the
+ * Clear / Run&amp;Send action buttons.
+ */
+public final class MainFrame extends JFrame {
+
+    private static final Logger LOG = Logger.getLogger(MainFrame.class.getName());
+
+    private final OrderState state = new OrderState();
+    private final UdpDispenseClient client;
+    private final JLabel display = new JLabel(" ", SwingConstants.RIGHT);
+
+    public MainFrame(UdpDispenseClient client) {
+        super("Liquid Flow Meter");
+        this.client = client;
+
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout(4, 4));
+
+        display.setBorder(BorderFactory.createTitledBorder("ml"));
+        add(display, BorderLayout.NORTH);
+
+        add(new KeypadPanel(e -> onDigit(e.getActionCommand())), BorderLayout.CENTER);
+        add(new DrinkChoicePanel(this::onDrink), BorderLayout.WEST);
+
+        JButton clear = new JButton("Clear");
+        clear.addActionListener(e -> onClear());
+        add(clear, BorderLayout.SOUTH);
+
+        JButton run = new JButton("Run & Send");
+        run.addActionListener(e -> onRun());
+        add(run, BorderLayout.EAST);
+
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    private void onDigit(String digit) {
+        state.appendDigit(digit.charAt(0));
+        refreshDisplay();
+    }
+
+    private void onDrink(DrinkType drink) {
+        state.setDrink(drink);
+        LOG.log(Level.FINE, "Drink selected: {0}", drink);
+    }
+
+    private void onClear() {
+        state.clear();
+        refreshDisplay();
+    }
+
+    private void onRun() {
+        if (!state.hasAmount() || state.drink() == null) {
+            JOptionPane.showMessageDialog(this,
+                    "Pick a drink and enter an amount first.",
+                    "Incomplete order",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        try {
+            client.send(new DispenseRequest(state.drink(), state.amountMillilitres()));
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, "Failed to send dispense request", ex);
+            JOptionPane.showMessageDialog(this,
+                    "Could not reach dispenser: " + ex.getMessage(),
+                    "Network error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void refreshDisplay() {
+        display.setText(state.hasAmount() ? state.amountText() : " ");
+    }
+}
